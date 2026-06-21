@@ -32,7 +32,7 @@ cloud model later without touching the agent logic.
 🚧 Early scaffold. Build order:
 
 1. ✅ Monorepo + `@milo/shared` (types & contracts)
-2. ⬜ `@milo/extension` skeleton (capture)
+2. ✅ `@milo/extension` skeleton (capture + on-device enrichment + live progress)
 3. ⬜ Search (embeddings)
 4. ⬜ `@milo/agent` (RAG + chat + dashboard)
 5. ⬜ Data bridge (export/import)
@@ -41,5 +41,10 @@ cloud model later without touching the agent logic.
 
 ```bash
 pnpm install
-pnpm typecheck   # check the whole workspace
+pnpm typecheck                      # check the whole workspace
+pnpm --filter @milo/extension build # → packages/extension/dist/
 ```
+
+Then load `packages/extension/dist/` unpacked at `chrome://extensions`
+(Developer mode → Load unpacked). On-device enrichment needs Chrome's built-in
+AI; without it, capture still saves the raw text + page title.
