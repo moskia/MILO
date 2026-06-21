@@ -58,3 +58,29 @@ export interface CaptureInput {
   source: NoteSource;
   topicId: string | null;
 }
+
+/** Which enrichment steps a capture runs through. */
+export interface CaptureProgress {
+  format: boolean;
+  title: boolean;
+  tags: boolean;
+  summary: boolean;
+}
+
+/**
+ * A capture that is being processed in the background. Lives only in memory in
+ * the service worker; the popup mirrors it for the live progress UI.
+ */
+export interface CaptureTask {
+  id: string;
+  status: "processing" | "done" | "error";
+  progress: CaptureProgress;
+  pageTitle: string;
+  startedAt: number;
+  /** Partial result shown while steps complete (title/summary/tags so far). */
+  preview: {
+    title: string;
+    summary: string;
+    tags: string[];
+  };
+}

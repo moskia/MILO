@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "MILO",
+  "version": "0.1.0",
+  "description": "Capture what you learn while browsing; a local agent turns it into a clear picture of what you know.",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "MILO"
+  },
+  "permissions": ["storage", "activeTab", "scripting", "notifications"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}

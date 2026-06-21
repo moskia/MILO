@@ -23,6 +23,14 @@ export interface TextGenerator {
   complete(prompt: string, options?: CompletionOptions): Promise<string>;
 }
 
+/** Condenses text into a short summary (Chrome's dedicated Summarizer API). */
+export interface Summarizer {
+  /** Stable id, e.g. "gemini-nano-summarizer". */
+  readonly id: string;
+  isAvailable(): Promise<boolean>;
+  summarize(text: string): Promise<string>;
+}
+
 /** Turns text into a fixed-length semantic vector. */
 export interface Embedder {
   /** Stable id of the embedding model, stored on each note as `embeddingModel`. */
