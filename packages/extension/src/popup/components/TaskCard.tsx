@@ -5,6 +5,7 @@ const STEPS: Array<[keyof CaptureProgress, string]> = [
   ["title", "Title"],
   ["tags", "Tags"],
   ["summary", "Summary"],
+  ["indexing", "Indexing"],
 ];
 
 /** Live per-step progress for a capture being processed in the background. */

@@ -65,6 +65,7 @@ export interface CaptureProgress {
   title: boolean;
   tags: boolean;
   summary: boolean;
+  indexing: boolean;
 }
 
 /**

@@ -11,7 +11,7 @@ export function createTask(id: string, pageTitle: string): CaptureTask {
   const task: CaptureTask = {
     id,
     status: "processing",
-    progress: { format: false, title: false, tags: false, summary: false },
+    progress: { format: false, title: false, tags: false, summary: false, indexing: false },
     pageTitle,
     startedAt: Date.now(),
     preview: { title: "", summary: "", tags: [] },

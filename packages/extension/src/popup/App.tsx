@@ -18,6 +18,7 @@ export function App() {
   const [results, setResults] = useState<Note[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [searchMode, setSearchMode] = useState<"keyword" | "semantic">("keyword");
 
   // Run a keyword search when the query is non-empty; otherwise show all notes.
   useEffect(() => {
@@ -27,13 +28,13 @@ export function App() {
       return;
     }
     let active = true;
-    void sendRequest({ type: "search/run", query: q, mode: "keyword" }).then((response) => {
+    void sendRequest({ type: "search/run", query: q, mode: searchMode }).then((response) => {
       if (active && response.ok) setResults(response.data.map((result) => result.note));
     });
     return () => {
       active = false;
     };
-  }, [query]);
+  }, [query, searchMode]);
 
   const visible = results ?? notes;
   const selected = useMemo(
@@ -49,6 +50,14 @@ export function App() {
           MILO
         </div>
         <SearchBar value={query} onChange={setQuery} />
+        <button
+          type="button"
+          onClick={() => setSearchMode((m) => (m === "keyword" ? "semantic" : "keyword"))}
+          className="shrink-0 rounded-lg border border-zinc-200 px-2 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-100"
+          title="Switch search mode"
+        >
+          {searchMode === "semantic" ? "Meaning" : "Exact"}
+        </button>
         <Settings />
       </header>
 

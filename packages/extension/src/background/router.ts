@@ -10,6 +10,7 @@ import { NoteRepository } from "./storage/notes";
 import { startCapture } from "./capture/pipeline";
 import { listTasks } from "./capture/tasks";
 import { keywordSearch } from "./search/keyword";
+import { semanticSearch } from "./search/semantic";
 import { broadcast } from "./events";
 
 async function handle(request: Request): Promise<Result<unknown>> {
@@ -50,8 +51,11 @@ async function handle(request: Request): Promise<Result<unknown>> {
 
     case "search/run": {
       const notes = await NoteRepository.list();
-      // `mode` is accepted now; semantic falls back to keyword until Step 3.
-      return ok(keywordSearch(request.query, notes));
+      const results =
+        request.mode === "semantic"
+          ? await semanticSearch(request.query, notes)
+          : keywordSearch(request.query, notes);
+      return ok(results);
     }
 
     case "export/bundle": {
