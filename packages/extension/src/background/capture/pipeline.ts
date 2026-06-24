@@ -11,6 +11,7 @@ import { startKeepAlive, stopKeepAlive } from "../keepalive";
 import { broadcast } from "../events";
 import { completeTask, createTask, failTask, updateTask } from "./tasks";
 import { formatPrompt, tagsPrompt, titlePrompt } from "./prompts";
+import { miniLMEmbedder } from "../ai/embedder";
 
 function newId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -71,6 +72,17 @@ async function run(task: CaptureTask, input: CaptureInput): Promise<void> {
     task.preview = { ...task.preview, summary };
     updateTask(task);
 
+    // 5. Index - turn the note into meaning numbers for semantic search
+    let embedding: number[] | null = null;
+    try {
+      const textToEmbed = [title, summary, content].filter(Boolean).join(" ");
+      embedding = await miniLMEmbedder.embed(textToEmbed);
+    } catch (error) {
+      console.warn("[MILO] embedding step skipped:", error);
+    }
+    task.progress.indexing = true;
+    updateTask(task);
+
     // Save. Embedding is left null for Step 3 (semantic search) to backfill.
     const now = Date.now();
     const note: Note = {
@@ -82,8 +94,8 @@ async function run(task: CaptureTask, input: CaptureInput): Promise<void> {
       tags,
       source: input.source,
       userNotes: "",
-      embedding: null,
-      embeddingModel: null,
+      embedding,
+      embeddingModel: embedding ? miniLMEmbedder.id : null,
       createdAt: now,
       updatedAt: now,
     };
