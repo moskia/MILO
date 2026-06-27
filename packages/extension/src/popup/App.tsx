@@ -10,6 +10,7 @@ import { NoteList } from "./components/NoteList";
 import { NoteDetail } from "./components/NoteDetail";
 import { TaskCard } from "./components/TaskCard";
 import { Toast } from "./components/Toast";
+import { ExportButton } from "./components/ExportButton";
 
 export function App() {
   const { notes, reload } = useNotes();
@@ -58,6 +59,7 @@ export function App() {
         >
           {searchMode === "semantic" ? "Meaning" : "Exact"}
         </button>
+        <ExportButton />
         <Settings />
       </header>
 
