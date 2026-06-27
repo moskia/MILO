@@ -5,6 +5,7 @@ import { ImportScreen } from "./components/ImportScreen";
 import { SubjectBar } from "./components/SubjectBar";
 import { semanticRetrieve } from "./lib/retrieve";
 import { summarizeLearning } from "./agent/summarize";
+import { Chat } from "./components/Chat";
 
 export function App() {
   const [notes, setNotes] = useState<Note[]>(() => loadNotes());
@@ -95,6 +96,8 @@ export function App() {
           </ul>
         )}
       </div>
+
+      <Chat notes={notes} />
     </div>
   );
 }
