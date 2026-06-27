@@ -4,16 +4,20 @@ import { loadNotes } from "./lib/store";
 import { ImportScreen } from "./components/ImportScreen";
 import { SubjectBar } from "./components/SubjectBar";
 import { semanticRetrieve } from "./lib/retrieve";
+import { summarizeLearning } from "./agent/summarize";
 
 export function App() {
   const [notes, setNotes] = useState<Note[]>(() => loadNotes());
   const [subject, setSubject] = useState("");
   const [related, setRelated] = useState<Note[]>([]);
   const [searching, setSearching] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summarizing, setSummarizing] = useState(false);
 
-  // Retrieval is now async (it embeds the subject), so it runs in an effect.
+  // Retrieval is async (it embeds the subject), so it runs in an effect.
   useEffect(() => {
     const q = subject.trim();
+    setSummary(null); // a new subject makes the old summary stale
     if (q === "") {
       setRelated([]);
       return;
@@ -30,6 +34,17 @@ export function App() {
     };
   }, [subject, notes]);
 
+  const onSummarize = async () => {
+    setSummarizing(true);
+    try {
+      setSummary(await summarizeLearning(subject, related));
+    } catch {
+      setSummary("Couldn't generate a summary. Is Chrome's built-in AI enabled?");
+    } finally {
+      setSummarizing(false);
+    }
+  };
+
   if (notes.length === 0) {
     return <ImportScreen onImported={() => setNotes(loadNotes())} />;
   }
@@ -41,6 +56,22 @@ export function App() {
       </h1>
 
       <SubjectBar value={subject} onChange={setSubject} />
+
+      {related.length > 0 && (
+        <button
+          onClick={onSummarize}
+          disabled={summarizing}
+          className="mt-3 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+        >
+          {summarizing ? "Thinking…" : "What have I learned?"}
+        </button>
+      )}
+
+      {summary && (
+        <div className="mt-4 whitespace-pre-wrap rounded-lg bg-indigo-50 p-4 text-sm text-zinc-700">
+          {summary}
+        </div>
+      )}
 
       <div className="mt-4">
         {subject.trim() === "" ? (
