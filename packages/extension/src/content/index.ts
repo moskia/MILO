@@ -10,12 +10,14 @@ import type { CaptureInput, Event, Request } from "@milo/shared";
 import { injectStyles } from "./styles";
 import { hideCaptureButton, showCaptureButton } from "./capture-button";
 import { showToast } from "./notify";
+import { initAgentBridge } from "./bridge";
 
 const MIN_SELECTION_LENGTH = 10;
 let lastSelection = "";
 
 function init(): void {
   injectStyles();
+  initAgentBridge();
   document.addEventListener("mouseup", (event) => void onMouseUp(event));
 
   chrome.runtime.onMessage.addListener((message: unknown) => {
