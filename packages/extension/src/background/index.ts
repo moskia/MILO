@@ -4,10 +4,12 @@
 import { registerRouter } from "./router";
 import { geminiTextGenerator } from "./ai/gemini-text";
 import { geminiSummarizer } from "./ai/gemini-summary";
+import { backfillEmbeddings } from "./maintenance/backfill";
 
 console.log("[MILO] background service worker started");
 
 registerRouter();
+void backfillEmbeddings();
 
 // Best-effort availability checks (also nudge Chrome to provision the models).
 void geminiTextGenerator.isAvailable();
