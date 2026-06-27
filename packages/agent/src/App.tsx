@@ -1,19 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Note } from "@milo/shared";
 import { loadNotes } from "./lib/store";
 import { ImportScreen } from "./components/ImportScreen";
 import { SubjectBar } from "./components/SubjectBar";
-import { keywordRetrieve } from "./lib/retrieve";
+import { semanticRetrieve } from "./lib/retrieve";
 
 export function App() {
   const [notes, setNotes] = useState<Note[]>(() => loadNotes());
   const [subject, setSubject] = useState("");
+  const [related, setRelated] = useState<Note[]>([]);
+  const [searching, setSearching] = useState(false);
+
+  // Retrieval is now async (it embeds the subject), so it runs in an effect.
+  useEffect(() => {
+    const q = subject.trim();
+    if (q === "") {
+      setRelated([]);
+      return;
+    }
+    let active = true;
+    setSearching(true);
+    void semanticRetrieve(q, notes).then((found) => {
+      if (!active) return;
+      setRelated(found);
+      setSearching(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, [subject, notes]);
 
   if (notes.length === 0) {
     return <ImportScreen onImported={() => setNotes(loadNotes())} />;
   }
-
-  const related = keywordRetrieve(subject, notes);
 
   return (
     <div className="mx-auto max-w-2xl p-6">
@@ -28,6 +47,8 @@ export function App() {
           <p className="text-sm text-zinc-500">
             {notes.length} notes loaded. Type a subject above.
           </p>
+        ) : searching ? (
+          <p className="text-sm text-zinc-500">Searching…</p>
         ) : related.length === 0 ? (
           <p className="text-sm text-zinc-500">No notes match “{subject}”.</p>
         ) : (
